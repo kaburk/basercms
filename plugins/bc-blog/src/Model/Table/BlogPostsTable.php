@@ -675,11 +675,13 @@ class BlogPostsTable extends BlogAppTable
 
         $data->user_id = BcUtil::loginUser()['id'];
         if ($data->name) {
-            $baseName = mb_substr($data->name, 0, 250) . '_copy';
-            $data->name = $baseName;
-            for ($i = 1; $i <= 10 && $this->find()->where(['BlogPosts.name' => $data->name])->count(); $i++) {
+            $baseName = $data->name;
+            $copySuffix = '_copy';
+            $data->name = mb_substr($baseName, 0, 255 - mb_strlen($copySuffix)) . $copySuffix;
+            for ($i = 1; $i <= 10 && $this->exists(['BlogPosts.name' => $data->name]); $i++) {
                 $suffix = '_' . $i;
-                $data->name = mb_substr($baseName, 0, 255 - mb_strlen($suffix)) . $suffix;
+                $duplicateSuffix = $copySuffix . $suffix;
+                $data->name = mb_substr($baseName, 0, 255 - mb_strlen($duplicateSuffix)) . $duplicateSuffix;
             }
         }
         $data->title = mb_substr($data->title, 0, 250) . '_copy';
