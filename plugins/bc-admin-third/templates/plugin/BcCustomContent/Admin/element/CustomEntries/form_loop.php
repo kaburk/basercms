@@ -20,7 +20,8 @@
  */
 if (empty($customLink->children)) return;
 // 空の場合の対策（既にデータを持っていて、ループに対応していないフィールドタイプに変更した場合など
-echo $this->BcAdminForm->hidden($customLink->name, ['value' => ''])
+echo $this->BcAdminForm->hidden($customLink->name, ['value' => '']);
+$this->BcAdminForm->unlockField($customLink->name);
 ?>
 
 
@@ -29,7 +30,7 @@ echo $this->BcAdminForm->hidden($customLink->name, ['value' => ''])
     <?php foreach($entity->{$customLink->name} as $key => $value): ?>
       <div id="BcCcLoop<?php echo $customLink->name . '-' . $key ?>" class="bca-cc-loop-block">
 
-        <?php echo $this->BcAdminForm->hidden("{$customLink->name}.{$key}.custom_table_id", ['value' => $customTable->id]) ?>
+        <?php echo $this->BcAdminForm->hidden("{$customLink->name}.{$key}.custom_table_id", ['value' => $customTable->id, 'secure' => false]) ?>
 
         <table class="bca-form-table">
           <?php foreach($customLink->children as $child): ?>
@@ -88,7 +89,7 @@ echo $this->BcAdminForm->hidden($customLink->name, ['value' => ''])
 <!-- 追加用のソース -->
 <div id="BcCcLoopSrc<?php echo $customLink->name ?>" class="bca-cc-loop-block" hidden>
   <table class="bca-form-table">
-    <?php echo $this->BcAdminForm->hidden("{$customLink->name}.__loop-src__.custom_table_id", ['value' => $customTable->id]) ?>
+    <?php echo $this->BcAdminForm->hidden("{$customLink->name}.__loop-src__.custom_table_id", ['value' => $customTable->id, 'secure' => false]) ?>
     <?php foreach($customLink->children as $child): ?>
       <?php if (!$child->status) continue ?>
       <?php
@@ -112,7 +113,6 @@ echo $this->BcAdminForm->hidden($customLink->name, ['value' => ''])
           ]) ?>
         </td>
       </tr>
-      <?php $this->BcAdminForm->unlockField("{$customLink->name}") ?>
       <?php $this->BcAdminForm->unlockField("{$customLink->name}.__loop-src__.{$child->name}") ?>
     <?php endforeach ?>
   </table>
