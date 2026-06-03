@@ -357,6 +357,8 @@ class UtilitiesServiceTest extends BcTestCase
 
         $this->assertTrue(file_exists($zipSrcPath . 'PermissionsSchema.php'));
         $this->assertTrue(file_exists($zipSrcPath . 'pages.csv'));
+        $this->assertTrue(file_exists($zipSrcPath . 'BaserCorePhinxlogSchema.php'));
+        $this->assertTrue(file_exists($zipSrcPath . 'baser_core_phinxlog.csv'));
 
         //不要ファイルを削除
         $this->UtilitiesService->resetTmpSchemaFolder();
@@ -417,6 +419,34 @@ class UtilitiesServiceTest extends BcTestCase
         // データが復元されているか確認
         $this->assertEquals(1, UserFactory::count());
         $this->assertEquals(1, SiteFactory::count());
+    }
+
+    /**
+     * test getSchemaLoadPrefix
+     *
+     * @return void
+     */
+    public function test_getSchemaLoadPrefix()
+    {
+        $rs = $this->execPrivateMethod($this->UtilitiesService, 'getSchemaLoadPrefix', ['PermissionsSchema.php', 'bc_']);
+        $this->assertEquals('bc_', $rs);
+
+        $rs = $this->execPrivateMethod($this->UtilitiesService, 'getSchemaLoadPrefix', ['BaserCorePhinxlogSchema.php', 'bc_']);
+        $this->assertEquals('', $rs);
+    }
+
+    /**
+     * test getCsvLoadDbConfigKeyName
+     *
+     * @return void
+     */
+    public function test_getCsvLoadDbConfigKeyName()
+    {
+        $rs = $this->execPrivateMethod($this->UtilitiesService, 'getCsvLoadDbConfigKeyName', ['pages.csv', 'bc_', 'default']);
+        $this->assertEquals('default', $rs);
+
+        $rs = $this->execPrivateMethod($this->UtilitiesService, 'getCsvLoadDbConfigKeyName', ['baser_core_phinxlog.csv', 'bc_', 'default']);
+        $this->assertEquals('default_backup_no_prefix', $rs);
     }
 
     /**

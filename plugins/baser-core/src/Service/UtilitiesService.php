@@ -20,9 +20,12 @@ use BaserCore\Utility\BcZip;
 use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Core\Plugin;
+use Cake\Datasource\ConnectionManager;
+use Cake\Datasource\Exception\MissingDatasourceConfigException;
 use Cake\Log\LogTrait;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+use Cake\Utility\Inflector;
 use BaserCore\Annotation\UnitTest;
 use BaserCore\Annotation\NoTodo;
 use BaserCore\Annotation\Checked;
@@ -364,13 +367,33 @@ class UtilitiesService implements UtilitiesServiceInterface
         $tableList = $dbService->getAppTableList();
 
         $prefix = BcUtil::getCurrentDbConfig()['prefix'];
+        $backupTablePrefixes = [];
+
+        foreach ($tableList[$plugin] ?? [] as $table) {
+            $backupTablePrefixes[$table] = $prefix;
+        }
+
+        $phinxlogTable = Inflector::underscore($plugin) . '_phinxlog';
+        // phinxlog はスキーマ/CSV の出力ファイル名が衝突するため、両方存在しても片方のみ対象とする
+        if (in_array($phinxlogTable, $tables, true)) {
+            $backupTablePrefixes[$phinxlogTable] = '';
+        } elseif ($prefix && in_array($prefix . $phinxlogTable, $tables, true)) {
+            $backupTablePrefixes[$prefix . $phinxlogTable] = $prefix;
+        }
 
         foreach($tables as $table) {
-            $baredTable = preg_replace('/^' . $prefix . '/', '', $table);
-            if (!isset($tableList[$plugin]) || !in_array($table, $tableList[$plugin])) continue;
+            if (!array_key_exists($table, $backupTablePrefixes)) continue;
+
+            $schemaPrefix = $backupTablePrefixes[$table];
+            if ($schemaPrefix !== '' && str_starts_with($table, $schemaPrefix)) {
+                $baredTable = substr($table, strlen($schemaPrefix));
+            } else {
+                $baredTable = $table;
+            }
+
             if (!$dbService->writeSchema($baredTable, [
                 'path' => $path,
-                'prefix' => $prefix
+                'prefix' => $schemaPrefix
             ])) {
                 return false;
             }
@@ -465,20 +488,25 @@ class UtilitiesService implements UtilitiesServiceInterface
         $dbService = $this->getService(BcDatabaseServiceInterface::class);
 
         $prefix = BcUtil::getCurrentDbConfig()['prefix'];
+        $defaultDbConfigKeyName = 'default';
+        $noPrefixDbConfigKeyName = $defaultDbConfigKeyName . '_backup_no_prefix';
+        $usesNoPrefixDbConfig = false;
 
         $db = BcUtil::getCurrentDb();
         $db->begin();
         // テーブルを削除する
         foreach($files as $file) {
             if (!preg_match("/\.php$/", $file)) continue;
+            $schemaLoadPrefix = $this->getSchemaLoadPrefix($file, $prefix);
             try {
                 $dbService->loadSchema([
                     'type' => 'drop',
                     'path' => $path,
                     'file' => $file,
-                    'prefix' => $prefix
+                    'prefix' => $schemaLoadPrefix
                 ]);
             } catch (Throwable $e) {
+                $this->dropTemporaryDbConfig($noPrefixDbConfigKeyName, $usesNoPrefixDbConfig);
                 $db->rollback();
                 throw $e;
             }
@@ -487,16 +515,18 @@ class UtilitiesService implements UtilitiesServiceInterface
         // テーブルを読み込む
         foreach($files as $file) {
             if (!preg_match("/\.php$/", $file)) continue;
+            $schemaLoadPrefix = $this->getSchemaLoadPrefix($file, $prefix);
             try {
                 if (!$dbService->loadSchema([
                     'type' => 'create',
                     'path' => $path,
                     'file' => $file,
-                    'prefix' => $prefix
+                    'prefix' => $schemaLoadPrefix
                 ])) {
                     continue;
                 }
             } catch (Throwable $e) {
+                $this->dropTemporaryDbConfig($noPrefixDbConfigKeyName, $usesNoPrefixDbConfig);
                 $db->rollback();
                 throw $e;
             }
@@ -505,19 +535,27 @@ class UtilitiesService implements UtilitiesServiceInterface
         /* CSVファイルを読み込む */
         foreach($files as $file) {
             if (!preg_match("/\.csv$/", $file)) continue;
+            $csvLoadDbConfigKeyName = $this->getCsvLoadDbConfigKeyName($file, $prefix, $defaultDbConfigKeyName);
+            if ($csvLoadDbConfigKeyName !== $defaultDbConfigKeyName) {
+                $this->setupNoPrefixDbConfig($defaultDbConfigKeyName, $csvLoadDbConfigKeyName);
+                $usesNoPrefixDbConfig = true;
+            }
             try {
                 if (!$dbService->loadCsv([
                     'path' => $path . $file,
-                    'encoding' => $encoding
+                    'encoding' => $encoding,
+                    'dbConfigKeyName' => $csvLoadDbConfigKeyName
                 ])) {
                     continue;
                 }
             } catch (Throwable $e) {
+                $this->dropTemporaryDbConfig($noPrefixDbConfigKeyName, $usesNoPrefixDbConfig);
                 $db->rollback();
                 throw $e;
             }
         }
         $db->commit();
+        $this->dropTemporaryDbConfig($noPrefixDbConfigKeyName, $usesNoPrefixDbConfig);
     }
 
     /**
@@ -540,6 +578,94 @@ class UtilitiesService implements UtilitiesServiceInterface
         } catch (\Throwable $e) {
             throw $e;
         }
+    }
+
+    /**
+     * スキーマ復元時に利用するプレフィックスを判定する。
+     *
+     * phinxlog テーブルはマイグレーションで管理されるため、プレフィックスなしとして扱う。
+     *
+     * @param string $schemaFile スキーマファイル名
+     * @param string $prefix 現在のDBプレフィックス
+     * @return string 読み込みに利用するプレフィックス
+     */
+    protected function getSchemaLoadPrefix(string $schemaFile, string $prefix): string
+    {
+        if (str_ends_with($schemaFile, 'PhinxlogSchema.php')) {
+            return '';
+        }
+        return $prefix;
+    }
+
+    /**
+     * CSV復元時に利用するDB設定キー名を判定する。
+     *
+     * DBプレフィックスが設定されている場合、phinxlog のCSVはプレフィックス無し接続を利用する。
+     *
+     * @param string $csvFile CSVファイル名
+     * @param string $prefix 現在のDBプレフィックス
+     * @param string $defaultDbConfigKeyName デフォルトのDB設定キー名
+     * @return string 読み込みに利用するDB設定キー名
+     */
+    protected function getCsvLoadDbConfigKeyName(string $csvFile, string $prefix, string $defaultDbConfigKeyName = 'default'): string
+    {
+        if ($prefix !== '' && preg_match('/_phinxlog\.csv$/', $csvFile)) {
+            return $defaultDbConfigKeyName . '_backup_no_prefix';
+        }
+        return $defaultDbConfigKeyName;
+    }
+
+    /**
+     * プレフィックス無し接続用のDB設定を準備する。
+     *
+     * @param string $baseDbConfigKeyName 元となるDB設定キー名
+     * @param string $newDbConfigKeyName 作成するDB設定キー名
+     * @return void
+     */
+    protected function setupNoPrefixDbConfig(string $baseDbConfigKeyName, string $newDbConfigKeyName): void
+    {
+        try {
+            $existingConfig = ConnectionManager::getConfig($newDbConfigKeyName);
+            // 一時設定以外が既に存在する場合は、誤った接続先で復元してしまう可能性があるため中断する
+            if (empty($existingConfig['_bc_temporary'])) {
+                throw new BcException(__d('baser_core', 'DB設定「%s」が既に存在するため、一時的な no-prefix 接続を作成できません。既存設定を削除するか別名に変更してください。', $newDbConfigKeyName));
+            }
+            // 一時設定が残っている場合でも prefix が空であることを保証する
+            $existingConfig['prefix'] = '';
+            // setConfig だけでは既存の Connection インスタンスに反映されないため、いったん drop して作り直す
+            ConnectionManager::drop($newDbConfigKeyName);
+            ConnectionManager::setConfig($newDbConfigKeyName, $existingConfig);
+            return;
+        } catch (MissingDatasourceConfigException) {
+        }
+        $dbConfig = ConnectionManager::getConfig($baseDbConfigKeyName);
+        $dbConfig['prefix'] = '';
+        // 既存設定を誤って削除しないため、テンポラリとして作成したことを明示する
+        $dbConfig['_bc_temporary'] = true;
+        ConnectionManager::setConfig($newDbConfigKeyName, $dbConfig);
+    }
+
+    /**
+     * 利用した一時DB設定を削除する。
+     *
+     * @param string $dbConfigKeyName DB設定キー名
+     * @param bool $isUsed 利用したかどうか
+     * @return void
+     */
+    protected function dropTemporaryDbConfig(string $dbConfigKeyName, bool $isUsed): void
+    {
+        if (!$isUsed) {
+            return;
+        }
+        try {
+            $config = ConnectionManager::getConfig($dbConfigKeyName);
+        } catch (MissingDatasourceConfigException $e) {
+            return;
+        }
+        if (empty($config['_bc_temporary'])) {
+            return;
+        }
+        ConnectionManager::drop($dbConfigKeyName);
     }
 
 }
