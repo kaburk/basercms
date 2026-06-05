@@ -4501,6 +4501,7 @@ msgid "バージョン"
 msgstr ""
 
 #: ./plugins/bc-admin-third/templates/Admin/Updaters/exec_script.php:24
+#: ./plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:32
 msgid "実行"
 msgstr ""
 
@@ -6471,6 +6472,7 @@ msgstr ""
 #: ./plugins/bc-admin-third/templates/plugin/BcSearchIndex/Admin/element/search/search_indexes_index.php:46
 #: ./plugins/bc-front/templates/element/widget/search.php:48
 #: ./plugins/bc-front/templates/plugin/BcSearchIndex/SearchIndexes/search.php:35
+#: ./plugins/bc-seo/config/setting.php:31
 msgid "キーワード"
 msgstr ""
 
@@ -11584,6 +11586,67 @@ msgstr ""
 
 #: ./plugins/bc-search-index/config.php:15
 msgid "サイト内の横断検索機能"
+msgstr ""
+
+#: ./plugins/bc-seo/config.php:14
+#: ./plugins/bc-seo/templates/Admin/element/seo_form.php:31
+msgid "SEO設定"
+msgstr ""
+
+#: ./plugins/bc-seo/config.php:15
+msgid "コンテンツやブログ記事などにSEO用の設定を追加します。"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:26
+msgid "ディスクリプション"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:36
+msgid "カノニカル URL"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:49
+msgid "OG タイトル"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:58
+msgid "OG ディスクリプション"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:63
+msgid "OG タイプ"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:68
+msgid "OG イメージ"
+msgstr ""
+
+#: ./plugins/bc-seo/config/setting.php:73
+msgid "OG URL"
+msgstr ""
+
+#: ./plugins/bc-seo/src/Model/Table/SeoMetasTable.php:73
+msgid "画像を選択してください。"
+msgstr ""
+
+#: ./plugins/bc-seo/src/Model/Table/SeoMetasTable.php:81
+msgid "{0}文字以内で入力してください。"
+msgstr ""
+
+#: ./plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:12
+msgid "DB更新"
+msgstr ""
+
+#: ./plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:15
+msgid "DBテーブルに存在しない項目のカラムを追加します。"
+msgstr ""
+
+#: ./plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:19
+msgid "以下の項目のカラムを追加しました。"
+msgstr ""
+
+#: ./plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:26
+msgid "追加対象の項目はありませんでした。"
 msgstr ""
 
 #: ./plugins/bc-search-index/config/permission.php:23

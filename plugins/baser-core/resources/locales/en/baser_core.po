@@ -5,14 +5,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: baserCMS\n"
 "POT-Creation-Date: 2024-10-14 10:09+0900\n"
-"PO-Revision-Date: 2024-10-14 10:12+0900\n"
-"Last-Translator: ryuring\n"
+"PO-Revision-Date: 2026-06-09 11:37+0900\n"
+"Last-Translator: baserCMS Users Community\n"
 "Language-Team: baserCMS Users Community <info@basercms.net>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.9\n"
 
 #: plugins/baser-core/config/permission.php:22
 msgid "コンテンツフォルダ管理"
@@ -3042,8 +3042,8 @@ msgstr "Please enter password within 255 characters."
 #: plugins/baser-core/src/Model/Table/UsersTable.php:241
 #, fuzzy
 #| msgid ""
-#| "パスワードは半角英数字(英字は大文字小文字を区別)とスペース、記号(._-:/()#,"
-#| "@[]+=&;{}!$*)のみで入力してください。"
+#| "パスワードは半角英数字(英字は大文字小文字を区別)とスペース、記号(._-:/"
+#| "()#,@[]+=&;{}!$*)のみで入力してください。"
 msgid "パスワードは半角英数字(英字は大文字小文字を区別)とスペース、記号("
 msgstr ""
 "Please enter password only with half-size alphabets and numbers (capitals "
@@ -4978,6 +4978,7 @@ msgid "バージョン"
 msgstr "Version"
 
 #: plugins/bc-admin-third/templates/Admin/Updaters/exec_script.php:24
+#: plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:32
 msgid "実行"
 msgstr "Run"
 
@@ -6191,8 +6192,8 @@ msgid ""
 "テンプレートで利用する場合は、<br>&lt;?php $this->BcBaser->metaKeywords() ?"
 "&gt; で出力します。"
 msgstr ""
-"If you want to use it in a template,<br>&lt;?php $this-&gt;BcBaser-&gt;"
-"metaKeywords() ?&gt;."
+"If you want to use it in a template,<br>&lt;?php $this-&gt;BcBaser-"
+"&gt;metaKeywords() ?&gt;."
 
 #: plugins/bc-admin-third/templates/Admin/element/Sites/form.php:103
 msgid "サイト基本説明文"
@@ -6203,8 +6204,8 @@ msgid ""
 "テンプレートで利用する場合は、<br>&lt;?php $this->BcBaser-"
 ">metaDescription() ?&gt; で出力します。"
 msgstr ""
-"If you want to use it in a template,<br>&lt;?php $this-&gt;BcBaser-&gt;"
-"metaDescription() ?&gt;."
+"If you want to use it in a template,<br>&lt;?php $this-&gt;BcBaser-"
+"&gt;metaDescription() ?&gt;."
 
 #: plugins/bc-admin-third/templates/Admin/element/Sites/form.php:114
 #: plugins/bc-admin-third/templates/Admin/element/Sites/index_list.php:97
@@ -7157,16 +7158,16 @@ msgid ""
 "レイアウトテンプレートの場合・・・ theme/テーマフォルダ/Layouts/smartphone/"
 "default.php を配置"
 msgstr ""
-"For Layout Template: Place theme/{theme folder}/Layouts/smartphone/default."
-"php"
+"For Layout Template: Place theme/{theme folder}/Layouts/smartphone/"
+"default.php"
 
 #: plugins/bc-admin-third/templates/Admin/element/help/sites_form.php:27
 msgid ""
 "エレメントテンプレートの場合・・・ theme/テーマフォルダ/Elements/smartphone/"
 "crumbs.php を配置"
 msgstr ""
-"For Element Template: Place theme/{theme folder}/Elements/smartphone/crumbs."
-"php"
+"For Element Template: Place theme/{theme folder}/Elements/smartphone/"
+"crumbs.php"
 
 #: plugins/bc-admin-third/templates/Admin/element/help/sites_form.php:28
 msgid ""
@@ -7478,8 +7479,9 @@ msgstr "Clear"
 #: plugins/bc-admin-third/templates/plugin/BcSearchIndex/Admin/element/search/search_indexes_index.php:46
 #: plugins/bc-front/templates/element/widget/search.php:48
 #: plugins/bc-front/templates/plugin/BcSearchIndex/SearchIndexes/search.php:35
+#: plugins/bc-seo/config/setting.php:31
 msgid "キーワード"
-msgstr "Keywords."
+msgstr "Keywords"
 
 #: plugins/bc-admin-third/templates/Admin/element/sidebar.php:32
 msgid "管理メニュー"
@@ -13481,6 +13483,67 @@ msgstr "Y/m/d"
 msgid "サイト内の横断検索機能"
 msgstr "Cross-site search function"
 
+#: plugins/bc-seo/config.php:14
+#: plugins/bc-seo/templates/Admin/element/seo_form.php:31
+msgid "SEO設定"
+msgstr "SEO Settings"
+
+#: plugins/bc-seo/config.php:15
+msgid "コンテンツやブログ記事などにSEO用の設定を追加します。"
+msgstr "Adds SEO settings to content and blog posts."
+
+#: plugins/bc-seo/config/setting.php:26
+msgid "ディスクリプション"
+msgstr "Description"
+
+#: plugins/bc-seo/config/setting.php:36
+msgid "カノニカル URL"
+msgstr "Canonical URL"
+
+#: plugins/bc-seo/config/setting.php:49
+msgid "OG タイトル"
+msgstr "OG Title"
+
+#: plugins/bc-seo/config/setting.php:58
+msgid "OG ディスクリプション"
+msgstr "OG Description"
+
+#: plugins/bc-seo/config/setting.php:63
+msgid "OG タイプ"
+msgstr "OG Type"
+
+#: plugins/bc-seo/config/setting.php:68
+msgid "OG イメージ"
+msgstr "OG Image"
+
+#: plugins/bc-seo/config/setting.php:73
+msgid "OG URL"
+msgstr "OG URL"
+
+#: plugins/bc-seo/src/Model/Table/SeoMetasTable.php:73
+msgid "画像を選択してください。"
+msgstr "Please select an image."
+
+#: plugins/bc-seo/src/Model/Table/SeoMetasTable.php:81
+msgid "{0}文字以内で入力してください。"
+msgstr "Please enter within {0} characters."
+
+#: plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:12
+msgid "DB更新"
+msgstr "Update DB"
+
+#: plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:15
+msgid "DBテーブルに存在しない項目のカラムを追加します。"
+msgstr "Adds columns for items that do not exist in the DB table."
+
+#: plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:19
+msgid "以下の項目のカラムを追加しました。"
+msgstr "The columns for the following items have been added."
+
+#: plugins/bc-seo/templates/Admin/SeoConfigs/update_db.php:26
+msgid "追加対象の項目はありませんでした。"
+msgstr "There were no items to add."
+
 #: plugins/bc-search-index/config/permission.php:23
 msgid "検索インデックス管理"
 msgstr "Search index management"
@@ -14538,8 +14601,8 @@ msgstr "Widgets"
 #~ msgstr ""
 #~ "Switching Admin System to SSL. Are you sure?<br><br>Admin System won't be "
 #~ "displayed if server isn't compatible with SSL.<br><br>Please restore it "
-#~ "by adjusting BcEnv.sslUrl in /app/Config/install.php or change BcApp."
-#~ "adminSsl value to false if it became impossible to display it."
+#~ "by adjusting BcEnv.sslUrl in /app/Config/install.php or change "
+#~ "BcApp.adminSsl value to false if it became impossible to display it."
 
 #~ msgid ""
 #~ "baserCMSを設置しているURLを指定します。管理画面等でSSL通信を利用する場合"
@@ -15041,8 +15104,8 @@ msgstr "Widgets"
 #~ "このメソッドは非推奨となりました。BcWidgetAreaHelper::showWidgets() に移行"
 #~ "してください。"
 #~ msgstr ""
-#~ "This method is deprecated. Please move to BcWidgetAreaHelper::"
-#~ "showWidgets()."
+#~ "This method is deprecated. Please move to "
+#~ "BcWidgetAreaHelper::showWidgets()."
 
 #~ msgid "site_configs テーブルの初期化に失敗"
 #~ msgstr "Failed initializing site_configs table"
@@ -15098,11 +15161,6 @@ msgstr "Widgets"
 
 #~ msgid "更新日に不正な文字列が入っています。"
 #~ msgstr "There are invalid strings in Update Date."
-
-#, fuzzy
-#~| msgid "PHPの構文エラーが発生しました。"
-#~ msgid "草稿欄でPHPの構文エラーが発生しました。"
-#~ msgstr "PHP syntax error occured."
 
 #~ msgid "PHPの構文エラーが発生しました。"
 #~ msgstr "PHP syntax error occured."
@@ -15239,8 +15297,8 @@ msgstr "Widgets"
 #~ msgstr "Import WordPress Data"
 
 #~ msgid ""
-#~ "WordPressから出力したXMLデータを取込みます。（<a href=\"http://ja."
-#~ "wordpress.org/\" target=\"_blank\">WordPress</a> 2.8.4 のみ動作確認済）"
+#~ "WordPressから出力したXMLデータを取込みます。（<a href=\"http://"
+#~ "ja.wordpress.org/\" target=\"_blank\">WordPress</a> 2.8.4 のみ動作確認済）"
 #~ msgstr ""
 #~ "Import XML data that is exporeted from WordPress. (Only tested with <a "
 #~ "href=\"http://en.wordpress.org/\" target=\"_blank\">WordPress</a> 2.8.4)"
@@ -15857,9 +15915,9 @@ msgstr "Widgets"
 #~ "オーサリングツールでの制作に慣れている方向けに、ファイルをアップロードして"
 #~ "データベースに一括で読み込む機能を備えています。<br />ページを読み込むに"
 #~ "は、特定のフォルダにページテンプレートをアップロードして、サブメニューの"
-#~ "「ページテンプレート読込」を実行します。<br /><a href=\"https://basercms."
-#~ "net/manuals/etc/5.html\" class=\"outside-link\" target=\"_blank\">ページテ"
-#~ "ンプレートの読込について</a>"
+#~ "「ページテンプレート読込」を実行します。<br /><a href=\"https://"
+#~ "basercms.net/manuals/etc/5.html\" class=\"outside-link\" "
+#~ "target=\"_blank\">ページテンプレートの読込について</a>"
 #~ msgstr ""
 #~ "You can upload files and import to database in bulk for creators familiar "
 #~ "with Authoring Tool.<br />Upload Page Template to specific Folder, and "
@@ -15892,9 +15950,9 @@ msgstr "Widgets"
 #~ "記二つのファイルにも書き込み権限が必要です。変更後は、必ず権限を元に戻して"
 #~ "ください。"
 #~ msgstr ""
-#~ "Write permission are needed for following 2 files besides above install."
-#~ "php to switching Smart URL from Admin System. Please restore permission "
-#~ "after changing."
+#~ "Write permission are needed for following 2 files besides above "
+#~ "install.php to switching Smart URL from Admin System. Please restore "
+#~ "permission after changing."
 
 #~ msgid "現在書き込み権限がありません"
 #~ msgstr "No write permission currently."

@@ -28,7 +28,7 @@
       data-bca-target="#SeoSettingBody" aria-expanded="false"
       aria-controls="SeoSettingBody"
     >
-      SEO設定
+      <?php echo __d('baser_core', 'SEO設定') ?>
       <i class="bca-icon--chevron-down bca-collapse__btn-icon"></i>
     </button>
   </div>
@@ -37,7 +37,7 @@
       <?php foreach ($seoFields as $fieldName => $fieldProp): ?>
         <tr>
           <th class="col-head bca-form-table__label">
-            <?php echo $this->BcAdminForm->label('seo_meta.' . $fieldName, $fieldProp['title']) ?>
+            <?php echo $this->BcAdminForm->label('seo_meta.' . $fieldName, __d('baser_core', $fieldProp['title'])) ?>
           </th>
           <td class="col-input bca-form-table__input">
             <?php if ($fieldProp['type'] == 'text'): ?>
