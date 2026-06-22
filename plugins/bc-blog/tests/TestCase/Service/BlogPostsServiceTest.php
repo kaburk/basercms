@@ -343,10 +343,15 @@ class BlogPostsServiceTest extends BcTestCase
 
         $blogPostsTable = $this->getTableLocator()->get('BcBlog.BlogPosts');
 
+        /** @var \Cake\ORM\Query $sqlQuery */
+        $sqlQuery = $this->BlogPostsService->createTagCondition($blogPostsTable->find(), 'tag1');
+        $sql = $sqlQuery->sql();
+        $this->assertStringContainsString('INNER JOIN blog_posts_blog_tags', $sql);
+        $this->assertStringContainsString('INNER JOIN blog_tags', $sql);
+        $this->assertStringNotContainsString('BlogPosts.id IN', $sql);
+
         // 単一：存在しているタグを確認場合
-        $query = $blogPostsTable->find();
-        $result = $this->BlogPostsService->createTagCondition($query, 'tag1');
-        $this->assertEquals(1, $result->count());
+        $this->assertEquals(1, $sqlQuery->count());
 
         // 配列：存在しているタグを確認場合
         $query = $blogPostsTable->find();
@@ -772,7 +777,7 @@ class BlogPostsServiceTest extends BcTestCase
         //戻り値を確認
         $this->assertEquals('test title 4', $result[1]);
 
-        //$field = blog_category_id　かつ　配列　blogContentIdと他の変数　
+        //$field = blog_category_id　かつ　配列　blogContentIdと他の変数
         $result = $this->BlogPostsService->getControlSource('blog_category_id', ['blogContentId' => 1, 'empty' => 'sd']);
         //戻り値を確認
         $this->assertEquals(['' => 'sd', 1 => 'test title 4'], $result);
