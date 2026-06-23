@@ -455,18 +455,6 @@ class PermissionsService implements PermissionsServiceInterface
             return true;
         }
 
-        // RESTful なルーティングに対応
-        // URL上アクションがなく、parseRequest で、アクションが index に設定された場合、
-        // POST メソッドであれば add アクションに変換する
-        if(!empty($urlArray['_ext'])
-            && $urlArray['_ext'] === 'json'
-            && $urlArray['action'] === 'index'
-            && $method === 'POST'
-        ) {
-            if(!preg_match('/\/index\.json$/', $url)) {
-                $url = preg_replace('/\.json$/', '/add.json', $url);
-            }
-        }
 
         // プレフィックスがない場合はフロントとみなす
         if(empty($urlArray['prefix'])) {
@@ -492,7 +480,31 @@ class PermissionsService implements PermissionsServiceInterface
             if ($type === 1) return true;
         }
 
-        return $this->isAuthorized($prefixAuthSetting['permissionType'], $url, $method, $groupPermission);
+        // URLとメソッドについて許可されているか確認
+        $authorized = $this->isAuthorized($prefixAuthSetting['permissionType'], $url, $method, $groupPermission);
+
+        // RESTful なルーティングに対応
+        // URL上アクションがなく、parseRequest で、アクションが index に設定された場合、
+        // POST メソッドであれば add アクションに変換して再判定する
+        if (!empty($urlArray['_ext'])
+            && $urlArray['_ext'] === 'json'
+            && $urlArray['action'] === 'index'
+            && $method === 'POST'
+        ) {
+            if (!preg_match('/\/index\.json$/', $url)) {
+                $convertedUrl = preg_replace('/\.json$/', '/add.json', $url);
+                $convertedAuthorized = $this->isAuthorized($prefixAuthSetting['permissionType'], $convertedUrl, $method, $groupPermission);
+
+                // ホワイトリスト: どちらかが許可なら許可 / ブラックリスト: どちらも許可なら許可
+                if ((int)$prefixAuthSetting['permissionType'] === 2) {
+                    $authorized = ($authorized && $convertedAuthorized);
+                } else {
+                    $authorized = ($authorized || $convertedAuthorized);
+                }
+            }
+        }
+
+        return $authorized;
     }
 
     /**
