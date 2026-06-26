@@ -566,4 +566,30 @@ class PermissionsServiceTest extends BcTestCase
         $this->assertEmpty($userGroupList);
     }
 
+    /**
+     * RESTful API の POST リクエストに対する判定確認 (Issue #4212 再発確認)
+     * /categories.json への POST リクエストが、/categories/add.json の許可ルールで許可されるか
+     */
+    public function testIsAuthorizedForCategoriesJson()
+    {
+        $currentFrontSetting = Configure::read('BcPrefixAuth.Front');
+        Configure::write('BcPrefixAuth.Front.disabled', false);
+        Configure::write('BcPrefixAuth.Front.permissionType', 1);
+
+        try {
+            $this->truncateTable('permissions');
+            PermissionFactory::make(['url' => '/categories/add.json', 'method' => 'POST', 'auth' => true])->persist();
+            $permissions = PermissionFactory::find()->all()->toArray();
+
+            // checkGroup を通じて判定することで、RESTful API の URL 補正ロジックを検証する
+            // 第3引数に $userGroup を渡すが、ここでは判定ロジックの検証なので null でも可
+            $this->assertTrue(
+                $this->execPrivateMethod($this->PermissionsService, 'checkGroup', ['/categories.json', $permissions, null, 'POST']),
+                'POST /categories.json should be authorized by /categories/add.json rule'
+            );
+        } finally {
+            Configure::write('BcPrefixAuth.Front', $currentFrontSetting);
+        }
+    }
+
 }
