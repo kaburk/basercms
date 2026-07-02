@@ -80,7 +80,7 @@ class ThemesController extends BcAdminApiController
         $theme = null;
         try {
             $theme = $service->add($this->getRequest()->getUploadedFiles());
-            $message = __d('baser_core', 'テーマファイル「{0}」を追加しました。', $theme->name);
+            $message = __d('baser_core', 'テーマファイル「{0}」を追加しました。', $theme);
             $this->BcMessage->setSuccess($message, true, false);
         } catch (\Throwable $e) {
             $message = __d('baser_core', 'データベース処理中にエラーが発生しました。') . $e->getMessage();
