@@ -13,8 +13,13 @@ declare(strict_types=1);
 
 namespace BaserCore\Model\Entity;
 
+use BaserCore\Annotation\UnitTest;
+use BaserCore\Annotation\NoTodo;
+use BaserCore\Annotation\Checked;
+use BaserCore\View\Helper\BcUploadHelper;
 use Cake\I18n\FrozenTime;
 use Cake\ORM\Entity;
+use Cake\View\View;
 
 /**
  * Content
@@ -64,5 +69,29 @@ class Content extends Entity
     protected array $_accessible = [
         '*' => true
     ];
+
+    /**
+     * アイキャッチのフルパス
+     */
+    protected array $_virtual = ['_eyecatch'];
+
+    /**
+     * アイキャッチのフルパスを取得
+     * @return string
+     * @checked
+     * @noTodo
+     * @unitTest
+     */
+    protected function _get_eyecatch()
+    {
+        try {
+            $BcUpload = new BcUploadHelper(new View());
+            $BcUpload->setTable('BaserCore.Contents');
+            // BlogPost::_get_eyecatch と同じ仕様に揃えるため、サイズを thumb に指定
+            return $BcUpload->uploadImage('eyecatch', $this, ['output' => 'url', 'imgsize' => 'thumb']);
+        } catch (\Throwable) {
+            return '';
+        }
+    }
 
 }
