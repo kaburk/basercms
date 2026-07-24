@@ -85,6 +85,8 @@ class ContentsControllerTest extends \BaserCore\TestSuite\BcTestCase
         $this->assertResponseOk();
         $result = json_decode((string)$this->_response->getBody());
         $this->assertEquals('baserCMSサンプル', $result->content->title);
+        // アイキャッチのフルパスが出力される事を確認
+        $this->assertObjectHasProperty('_eyecatch', $result->content);
     }
 
     /**

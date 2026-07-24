@@ -11,8 +11,11 @@
 
 namespace BcCustomContent\Model\Entity;
 
+use BcCcFile\View\Helper\BcCcFileHelper;
 use Cake\I18n\FrozenDate;
 use Cake\ORM\Entity;
+use Cake\ORM\TableRegistry;
+use Cake\View\View;
 use BaserCore\Annotation\UnitTest;
 use BaserCore\Annotation\NoTodo;
 use BaserCore\Annotation\Checked;
@@ -36,5 +39,33 @@ use BaserCore\Annotation\Checked;
  */
 class CustomEntry extends Entity
 {
+
+    /**
+     * JSON シリアライズ
+     *
+     * ファイルタイプのカスタムフィールドについて、そのまま読み込めるURLを
+     * `_{フィールド名}` として追加する
+     * @return array
+     * @checked
+     * @noTodo
+     * @unitTest
+     */
+    public function jsonSerialize(): array
+    {
+        $data = parent::jsonSerialize();
+        try {
+            $entriesTable = TableRegistry::getTableLocator()->get('BcCustomContent.CustomEntries');
+            if (empty($entriesTable->links)) return $data;
+            $BcCcFile = new BcCcFileHelper(new View());
+            foreach($entriesTable->links as $link) {
+                if ($link->custom_field->type !== 'BcCcFile') continue;
+                if (!empty($this->custom_table_id) && $link->custom_table_id !== $this->custom_table_id) continue;
+                $fieldValue = $this->{$link->name};
+                $data['_' . $link->name] = $fieldValue? $BcCcFile->get($fieldValue, $link, ['output' => 'url']) : '';
+            }
+        } catch (\Throwable) {
+        }
+        return $data;
+    }
 
 }
